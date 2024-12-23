@@ -1,3 +1,5 @@
-import Card from "./card";
+import Fridge from "./fridge";
 
-new Card()
+document.getElementById("add-button")?.addEventListener("click", () => {
+    Fridge.addCard();
+});

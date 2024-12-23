@@ -2,20 +2,99 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 600;
+}
+
+body {
+  background-color: black;
+  color: white;
 }
 
 #fridge {
   width: 100%;
   height: 100vh;
-  background-color: aliceblue;
+  background-color: black;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
 }
+
 .card {
-  background-color: red;
+  background-color: black;
+  border: 2px solid white;
+  border-radius: 10px;
+  padding: 10px;
   position: absolute;
   top: 0;
   left: 0;
+}
+.card.card-held {
+  border: 2px solid yellow;
+}
+.card.card-resizing {
+  border: 2px solid turquoise;
+}
+
+.button {
+  background-color: black;
+  color: white;
+  border: 2px solid white;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.button:hover {
+  border-color: lime;
+}
+
+.add-button {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  height: 40px;
+  width: 40px;
+  font-size: 30px;
+  z-index: 999;
+}
+.add-button:hover {
+  border-color: lime;
+}
+
+.delete-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  height: 30px;
+  width: 30px;
+  font-size: 30px;
+}
+.delete-button:hover {
+  border-color: red;
+}
+
+.resize-button {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  height: 30px;
+  width: 30px;
+  font-size: 25px;
+  font-weight: 900;
+}
+.resize-button:hover {
+  border-color: turquoise;
+  cursor: nwse-resize;
+}
+
+.counter-container {
+  position: absolute;
+  min-width: 180px;
+  top: 0;
+  right: 0;
+  padding: 10px;
+  font-size: 18px;
+  z-index: 0;
 }
