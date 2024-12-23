@@ -6,6 +6,7 @@
         <title>Document</title>
         <link rel="stylesheet" href="src/style.css">
         <script src="src/script.ts" type="module"></script>
+        <script src="https://cdn.tiny.cloud/1/sh7mkn3r1i8vrih3epbn6sgiazax7yjxdy9ebrupmthqmyda/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
     </head>
     <body>
         <button class="button add-button" id="add-button">+</button>
@@ -16,5 +17,19 @@
             <p class="counter">Na lodówce: <span id="count">0</span></p>
             <p class="counter">Przebieg: <span id="mileage">0</span></p>
         </div>
+
+
+        <script>
+            tinymce.init({
+                selector: 'textarea',
+                plugins: ['anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'visualblocks', 'wordcount'],
+                toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+                menubar: false,
+                content_style: "body { background-color: black; color: white; }",
+            });
+        </script>
+        <textarea>
+            Welcome to TinyMCE!
+        </textarea>
     </body>
 </html>
