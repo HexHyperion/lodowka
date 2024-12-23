@@ -25,8 +25,11 @@ body {
   background-color: black;
   border: 2px solid white;
   border-radius: 10px;
-  padding: 10px;
+  padding-inline: 20px;
+  padding-top: 40px;
+  padding-bottom: 15px;
   position: absolute;
+  overflow: hidden;
   top: 0;
   left: 0;
 }
@@ -37,6 +40,15 @@ body {
   border: 2px solid turquoise;
 }
 
+.card-text {
+  font-size: 18px;
+  overflow: scroll;
+  text-wrap: wrap;
+  word-wrap: break-word;
+  height: 100%;
+  width: 100%;
+}
+
 .button {
   background-color: black;
   color: white;
@@ -45,9 +57,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-.button:hover {
-  border-color: lime;
 }
 
 .add-button {
@@ -63,13 +72,25 @@ body {
   border-color: lime;
 }
 
+.edit-button {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  height: 25px;
+  width: 25px;
+  font-size: 15px;
+}
+.edit-button:hover {
+  border-color: yellow;
+}
+
 .delete-button {
   position: absolute;
   top: 5px;
   right: 5px;
-  height: 30px;
-  width: 30px;
-  font-size: 30px;
+  height: 25px;
+  width: 25px;
+  font-size: 25px;
 }
 .delete-button:hover {
   border-color: red;
@@ -79,9 +100,9 @@ body {
   position: absolute;
   bottom: 5px;
   right: 5px;
-  height: 30px;
-  width: 30px;
-  font-size: 25px;
+  height: 25px;
+  width: 25px;
+  font-size: 18px;
   font-weight: 900;
 }
 .resize-button:hover {
@@ -92,6 +113,7 @@ body {
 .counter-container {
   position: absolute;
   min-width: 180px;
+  z-index: 0;
   top: 0;
   right: 0;
   padding: 10px;

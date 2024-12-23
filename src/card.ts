@@ -1,11 +1,17 @@
 import Fridge from "./fridge";
 
 export default class Card {
+    zIndex: number = 0;
+
     constructor() {
         const card = document.createElement("div");
         card.classList.add("card");
 
-        card.innerText = "Bob the Card";
+        const cardText = document.createElement("div");
+        cardText.classList.add("card-text");
+        cardText.innerText = "Bob the Card lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+        card.appendChild(cardText);
+
         card.style.width = "200px";
         card.style.height = "200px";
 
@@ -15,7 +21,12 @@ export default class Card {
         Fridge.area.appendChild(card);
         card.style.top = `${Math.random() * (Fridge.area.clientHeight - card.clientHeight)}px`;  // Randomize card position
         card.style.left = `${Math.random() * (Fridge.area.clientWidth - card.clientWidth)}px`;
+
+        card.addEventListener("mousedown", () => {
+            this.bringToFront(card);
+        });
     }
+
 
     handleDrag(card: HTMLDivElement) {
         let startX = 0, startY = 0;
@@ -54,9 +65,19 @@ export default class Card {
         let startWidth = card.clientWidth;
         let startHeight = card.clientHeight;
 
+        const minWidth = 150;
+        const minHeight = 150;
+
         const doDrag = (event: MouseEvent) => {
-            card.style.width = `${startWidth + event.clientX - startX}px`;
-            card.style.height = `${startHeight + event.clientY - startY}px`;
+            const newWidth = startWidth + event.clientX - startX;
+            const newHeight = startHeight + event.clientY - startY;
+
+            if (newWidth >= minWidth) {
+                card.style.width = `${newWidth}px`;
+            }
+            if (newHeight >= minHeight) {
+                card.style.height = `${newHeight}px`;
+            }
         };
 
         const stopDrag = () => {
@@ -71,7 +92,23 @@ export default class Card {
         card.classList.add("card-resizing");
     }
 
+
+    bringToFront(card: HTMLDivElement) {
+        this.zIndex = ++Fridge.maxZIndex;
+        card.style.zIndex = this.zIndex.toString();
+    }
+
+
     addButtons(card: HTMLDivElement) {
+        const editButton = document.createElement("button");
+        editButton.innerText = "\u270E";   // Unicode pencil
+        editButton.classList.add("button");
+        editButton.classList.add("edit-button");
+        editButton.addEventListener("mousedown", () => {
+            // to do with WYSIWYG editor
+        });
+        card.appendChild(editButton);
+
         const deleteButton = document.createElement("button");
         deleteButton.innerText = "\u00D7";   // Unicode multiplication sign
         deleteButton.classList.add("button");
