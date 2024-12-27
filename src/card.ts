@@ -10,7 +10,7 @@ export default class Card {
 
         const cardText = document.createElement("div");
         cardText.classList.add("card-text");
-        cardText.innerText = "Bob the Card lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+        cardText.innerText = "Bob the Card";
         card.appendChild(cardText);
 
         card.style.width = "200px";
@@ -100,8 +100,13 @@ export default class Card {
 
         const textarea = document.createElement("textarea");
         textarea.id = `editor-${Date.now()}`;       // Set a unique ID for the textarea, otherwise there will be an error when initializing TinyMCE
-        textarea.value = (card.querySelector(".card-text") as HTMLElement).innerText || "";
+        textarea.value = (card.querySelector(".card-text") as HTMLElement)?.innerHTML || "";
         editorContainer.appendChild(textarea);
+
+        const buttonContainer = document.createElement("div");
+        buttonContainer.style.display = "flex";
+        buttonContainer.style.justifyContent = "space-between";
+        editorContainer.appendChild(buttonContainer);
 
         const saveButton = document.createElement("button");
         saveButton.innerText = "Save";
@@ -121,16 +126,30 @@ export default class Card {
                 document.body.removeChild(editorContainer);
             }
         });
-        editorContainer.appendChild(saveButton);
+        buttonContainer.appendChild(saveButton);
+
+        const cancelButton = document.createElement("button");
+        cancelButton.innerText = "Cancel";
+        cancelButton.classList.add("button");
+        cancelButton.style.padding = "5px";
+        cancelButton.addEventListener("click", () => {
+            document.body.removeChild(editorContainer);
+        });
+        buttonContainer.appendChild(cancelButton);
 
         document.body.appendChild(editorContainer);
 
         tinymce.init({
             selector: `#${textarea.id}`,
-            plugins: ['anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'visualblocks', 'wordcount'],
-            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+            plugins: ['anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'media', 'searchreplace', 'visualblocks', 'wordcount'],
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media | spellcheckdialog a11ycheck typography | align lineheight | emoticons charmap | removeformat',
             menubar: false,
             content_style: "body { background-color: black; color: white; }",
+            setup: (editor) => {
+                editor.on('init', () => {
+                    editor.setContent(textarea.value);
+                });
+            }
         });
     }
 
