@@ -1,4 +1,5 @@
 import Fridge from "./fridge";
+import tinymce from 'tinymce';
 
 export default class Card {
     zIndex: number = 0;
@@ -93,7 +94,48 @@ export default class Card {
     }
 
 
-    bringToFront(card: HTMLDivElement) {
+    showEditor(card: HTMLDivElement) {
+        const editorContainer = document.createElement("div");
+        editorContainer.classList.add("editor-container");
+
+        const textarea = document.createElement("textarea");
+        textarea.id = `editor-${Date.now()}`;       // Set a unique ID for the textarea, otherwise there will be an error when initializing TinyMCE
+        textarea.value = (card.querySelector(".card-text") as HTMLElement).innerText || "";
+        editorContainer.appendChild(textarea);
+
+        const saveButton = document.createElement("button");
+        saveButton.innerText = "Save";
+        saveButton.classList.add("button");
+        saveButton.style.padding = "5px";
+
+        saveButton.addEventListener("click", () => {
+            const editor = tinymce.get(textarea.id);    // I hate TinyMCE so much
+
+            if (editor) {
+                const content = editor ? editor.getContent() : textarea.value;
+                const cardText = card.querySelector(".card-text");
+
+                if (cardText) {
+                    cardText.innerHTML = content;
+                }
+                document.body.removeChild(editorContainer);
+            }
+        });
+        editorContainer.appendChild(saveButton);
+
+        document.body.appendChild(editorContainer);
+
+        tinymce.init({
+            selector: `#${textarea.id}`,
+            plugins: ['anchor', 'autolink', 'charmap', 'codesample', 'emoticons', 'image', 'link', 'lists', 'media', 'searchreplace', 'visualblocks', 'wordcount'],
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table mergetags | addcomment showcomments | spellcheckdialog a11ycheck typography | align lineheight | checklist numlist bullist indent outdent | emoticons charmap | removeformat',
+            menubar: false,
+            content_style: "body { background-color: black; color: white; }",
+        });
+    }
+
+
+    bringToFront(card: HTMLDivElement) {    // So stack, so overflow, much wow
         this.zIndex = ++Fridge.maxZIndex;
         card.style.zIndex = this.zIndex.toString();
     }
@@ -105,7 +147,7 @@ export default class Card {
         editButton.classList.add("button");
         editButton.classList.add("edit-button");
         editButton.addEventListener("mousedown", () => {
-            // to do with WYSIWYG editor
+            this.showEditor(card);
         });
         card.appendChild(editButton);
 

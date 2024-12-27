@@ -3,7 +3,6 @@
   padding: 0;
   box-sizing: border-box;
   font-family: 'Courier New', Courier, monospace;
-  font-weight: 600;
 }
 
 body {
@@ -119,4 +118,20 @@ body {
   padding: 10px;
   font-size: 18px;
   z-index: 0;
+}
+
+.editor-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: black;
+  border: 2px solid white;
+  border-radius: 10px;
+  padding: 20px;
+  z-index: 1000;
+}
+
+.editor-container .button {
+  margin-top: 10px;
 }
