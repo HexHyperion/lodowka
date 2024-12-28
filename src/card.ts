@@ -179,7 +179,8 @@ export default class Card {
         editButton.innerText = "\u270E";   // Unicode pencil
         editButton.classList.add("button");
         editButton.classList.add("edit-button");
-        editButton.addEventListener("mousedown", () => {
+        editButton.addEventListener("mousedown", (event) => {
+            event.stopPropagation();    // Prevents the card from being dragged when editing, TIL this is a thing
             this.showEditor(card);
         });
         card.appendChild(editButton);
@@ -199,7 +200,7 @@ export default class Card {
         resizeButton.classList.add("button");
         resizeButton.classList.add("resize-button");
         resizeButton.addEventListener("mousedown", (event) => {
-            event.stopPropagation();    // Prevents the card from being dragged when resizing, TIL this is a thing
+            event.stopPropagation();
             this.handleResize(card, event);
         });
         card.appendChild(resizeButton);

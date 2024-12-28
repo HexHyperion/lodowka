@@ -83,7 +83,7 @@ body {
   font-size: 15px;
 }
 .edit-button:hover {
-  border-color: yellow;
+  border-color: orange;
 }
 
 .delete-button {
