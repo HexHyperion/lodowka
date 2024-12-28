@@ -18,9 +18,10 @@ export default class Fridge {
         this.cards.push(new Card());
     }
 
-    static removeCard() {
+    static removeCard(deletedCard: Card) {
         this.cardCount--;
         this.updateCounters();
+        this.cards = this.cards.filter(card => card != deletedCard);
     }
 
     static updateCounters() {

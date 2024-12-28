@@ -2,7 +2,12 @@ import Fridge from "./fridge";
 import tinymce from 'tinymce';
 
 export default class Card {
-    zIndex: number = 0;
+    contents: string = "Bob the Card";
+    width: number = 200;
+    height: number = 200;
+    zIndex: number = 1;
+    x: number;
+    y: number;
 
     constructor() {
         const card = document.createElement("div");
@@ -10,18 +15,21 @@ export default class Card {
 
         const cardText = document.createElement("div");
         cardText.classList.add("card-text");
-        cardText.innerText = "Bob the Card";
+        cardText.innerHTML = this.contents;
         card.appendChild(cardText);
 
-        card.style.width = "200px";
-        card.style.height = "200px";
+        card.style.width = `${this.width}px`;
+        card.style.height = `${this.height}px`;
+
+        this.x = 75 + Math.floor(Math.random()*20);     // So they don't all stack on top of each other invisibly
+        this.y = 75 + Math.floor(Math.random()*20);
+        card.style.top = `${this.y}px`;
+        card.style.left = `${this.x}px`;
 
         this.addButtons(card);
         this.handleDrag(card);
 
         Fridge.area.appendChild(card);
-        card.style.top = `${Math.random() * (Fridge.area.clientHeight - card.clientHeight)}px`;  // Randomize card position
-        card.style.left = `${Math.random() * (Fridge.area.clientWidth - card.clientWidth)}px`;
 
         card.addEventListener("mousedown", () => {
             this.bringToFront(card);
@@ -34,8 +42,10 @@ export default class Card {
         let initialX = 0, initialY = 0;
 
         const doDrag = (event: MouseEvent) => {
-            card.style.top = `${initialY + event.clientY - startY}px`;
-            card.style.left = `${initialX + event.clientX - startX}px`;
+            this.x = initialX + event.clientX - startX;
+            this.y = initialY + event.clientY - startY;
+            card.style.top = `${this.y}px`;
+            card.style.left = `${this.x}px`;
         };
 
         const stopDrag = () => {
@@ -75,9 +85,11 @@ export default class Card {
 
             if (newWidth >= minWidth) {
                 card.style.width = `${newWidth}px`;
+                this.width = newWidth;
             }
             if (newHeight >= minHeight) {
                 card.style.height = `${newHeight}px`;
+                this.height = newHeight;
             }
         };
 
@@ -100,7 +112,7 @@ export default class Card {
 
         const textarea = document.createElement("textarea");
         textarea.id = `editor-${Date.now()}`;       // Set a unique ID for the textarea, otherwise there will be an error when initializing TinyMCE
-        textarea.value = (card.querySelector(".card-text") as HTMLElement)?.innerHTML || "";
+        textarea.value = this.contents;
         editorContainer.appendChild(textarea);
 
         const buttonContainer = document.createElement("div");
@@ -122,6 +134,7 @@ export default class Card {
 
                 if (cardText) {
                     cardText.innerHTML = content;
+                    this.contents = content;
                 }
                 document.body.removeChild(editorContainer);
             }
@@ -149,12 +162,13 @@ export default class Card {
                 editor.on('init', () => {
                     editor.setContent(textarea.value);
                 });
-            }
+            },
+            license_key: 'gpl'
         });
     }
 
 
-    bringToFront(card: HTMLDivElement) {    // So stack, so overflow, much wow
+    bringToFront(card: HTMLDivElement) {    // Will be funny after 2147483647 cards, but whatever
         this.zIndex = ++Fridge.maxZIndex;
         card.style.zIndex = this.zIndex.toString();
     }
@@ -175,7 +189,7 @@ export default class Card {
         deleteButton.classList.add("button");
         deleteButton.classList.add("delete-button");
         deleteButton.addEventListener("mousedown", () => {
-            Fridge.removeCard();
+            Fridge.removeCard(this);
             card.remove();
         });
         card.appendChild(deleteButton);
