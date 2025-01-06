@@ -55,7 +55,7 @@ export default class Card {
         };
 
         card.addEventListener("mousedown", (event) => {
-            event = event || window.event;
+            event = (event || window.event) as MouseEvent;
             event.preventDefault();
             startX = event.clientX;
             startY = event.clientY;
