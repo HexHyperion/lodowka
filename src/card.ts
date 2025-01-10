@@ -41,7 +41,7 @@ export default class Card {
         let startX = 0, startY = 0;
         let initialX = 0, initialY = 0;
 
-        const doDrag = (event: MouseEvent) => {
+        const doDrag = (event: PointerEvent) => {
             this.x = initialX + event.clientX - startX;
             this.y = initialY + event.clientY - startY;
             card.style.top = `${this.y}px`;
@@ -49,27 +49,27 @@ export default class Card {
         };
 
         const stopDrag = () => {
-            document.removeEventListener("mousemove", doDrag);
-            document.removeEventListener("mouseup", stopDrag);
+            document.removeEventListener("pointermove", doDrag);
+            document.removeEventListener("pointerup", stopDrag);
             card.classList.remove("card-held");
         };
 
-        card.addEventListener("mousedown", (event) => {
-            event = (event || window.event) as MouseEvent;
+        card.addEventListener("pointerdown", (event: PointerEvent) => {
+            event = event || window.event as PointerEvent;
             event.preventDefault();
             startX = event.clientX;
             startY = event.clientY;
             initialX = card.offsetLeft;
             initialY = card.offsetTop;
 
-            document.addEventListener("mousemove", doDrag);
-            document.addEventListener("mouseup", stopDrag);
+            document.addEventListener("pointermove", doDrag);
+            document.addEventListener("pointerup", stopDrag);
 
             card.classList.add("card-held");
         });
     }
 
-    handleResize(card: HTMLDivElement, event: MouseEvent) {
+    handleResize(card: HTMLDivElement, event: PointerEvent) {
         let startX = event.clientX;
         let startY = event.clientY;
 
@@ -79,7 +79,7 @@ export default class Card {
         const minWidth = 150;
         const minHeight = 150;
 
-        const doDrag = (event: MouseEvent) => {
+        const doDrag = (event: PointerEvent) => {
             const newWidth = startWidth + event.clientX - startX;
             const newHeight = startHeight + event.clientY - startY;
 
@@ -94,13 +94,13 @@ export default class Card {
         };
 
         const stopDrag = () => {
-            document.documentElement.removeEventListener('mousemove', doDrag);
-            document.documentElement.removeEventListener('mouseup', stopDrag);
+            document.documentElement.removeEventListener('pointermove', doDrag);
+            document.documentElement.removeEventListener('pointerup', stopDrag);
             card.classList.remove("card-resizing");
         };
 
-        document.documentElement.addEventListener('mousemove', doDrag);
-        document.documentElement.addEventListener('mouseup', stopDrag);
+        document.documentElement.addEventListener('pointermove', doDrag);
+        document.documentElement.addEventListener('pointerup', stopDrag);
 
         card.classList.add("card-resizing");
     }
@@ -115,41 +115,6 @@ export default class Card {
         textarea.value = this.contents;
         editorContainer.appendChild(textarea);
 
-        const buttonContainer = document.createElement("div");
-        buttonContainer.style.display = "flex";
-        buttonContainer.style.justifyContent = "space-between";
-        editorContainer.appendChild(buttonContainer);
-
-        const saveButton = document.createElement("button");
-        saveButton.innerText = "Save";
-        saveButton.classList.add("button");
-        saveButton.style.padding = "5px";
-
-        saveButton.addEventListener("click", () => {
-            const editor = tinymce.get(textarea.id);    // I hate TinyMCE so much
-
-            if (editor) {
-                const content = editor ? editor.getContent() : textarea.value;
-                const cardText = card.querySelector(".card-text");
-
-                if (cardText) {
-                    cardText.innerHTML = content;
-                    this.contents = content;
-                }
-                document.body.removeChild(editorContainer);
-            }
-        });
-        buttonContainer.appendChild(saveButton);
-
-        const cancelButton = document.createElement("button");
-        cancelButton.innerText = "Cancel";
-        cancelButton.classList.add("button");
-        cancelButton.style.padding = "5px";
-        cancelButton.addEventListener("click", () => {
-            document.body.removeChild(editorContainer);
-        });
-        buttonContainer.appendChild(cancelButton);
-
         document.body.appendChild(editorContainer);
 
         tinymce.init({
@@ -162,8 +127,43 @@ export default class Card {
                 editor.on('init', () => {
                     editor.setContent(textarea.value);
                 });
-            },
-            license_key: 'gpl'
+                // Those custom buttons inside TinyMCE
+                editor.on('PostRender', () => {
+                    const footer = editor.editorContainer.querySelector('.tox-statusbar');
+                    if (footer) {
+                        const buttonContainer = document.createElement("div");
+                        buttonContainer.classList.add("editor-button-container");
+
+                        const saveButton = document.createElement("button");
+                        saveButton.innerText = "\u2714";      // Unicode checkmark
+                        saveButton.classList.add("button");
+                        saveButton.classList.add("editor-button");
+                        saveButton.classList.add("editor-save-button");
+                        saveButton.addEventListener("click", () => {
+                            const content = editor.getContent();
+                            const cardText = card.querySelector(".card-text");
+                            if (cardText) {
+                                cardText.innerHTML = content;
+                                this.contents = content;
+                            }
+                            document.body.removeChild(editorContainer);
+                        });
+
+                        const cancelButton = document.createElement("button");
+                        cancelButton.innerText = "\u2716";    // Unicode heavy multiplication sign
+                        cancelButton.classList.add("button");
+                        cancelButton.classList.add("editor-button");
+                        cancelButton.classList.add("editor-cancel-button");
+                        cancelButton.addEventListener("click", () => {
+                            document.body.removeChild(editorContainer);
+                        });
+
+                        buttonContainer.appendChild(saveButton);
+                        buttonContainer.appendChild(cancelButton);
+                        footer.insertBefore(buttonContainer, footer.lastChild);
+                    }
+                });
+            }
         });
     }
 
@@ -179,17 +179,17 @@ export default class Card {
         editButton.innerText = "\u270E";   // Unicode pencil
         editButton.classList.add("button");
         editButton.classList.add("edit-button");
-        editButton.addEventListener("mousedown", (event) => {
+        editButton.addEventListener("pointerdown", (event: PointerEvent) => {
             event.stopPropagation();    // Prevents the card from being dragged when editing, TIL this is a thing
             this.showEditor(card);
         });
         card.appendChild(editButton);
 
         const deleteButton = document.createElement("button");
-        deleteButton.innerText = "\u00D7";   // Unicode multiplication sign
+        deleteButton.innerText = "\u2716";   // Unicode heavy multiplication sign
         deleteButton.classList.add("button");
         deleteButton.classList.add("delete-button");
-        deleteButton.addEventListener("mousedown", () => {
+        deleteButton.addEventListener("pointerdown", () => {
             Fridge.removeCard(this);
             card.remove();
         });
@@ -199,7 +199,7 @@ export default class Card {
         resizeButton.innerText = "\u21F2";   // Unicode resize arrow
         resizeButton.classList.add("button");
         resizeButton.classList.add("resize-button");
-        resizeButton.addEventListener("mousedown", (event) => {
+        resizeButton.addEventListener("pointerdown", (event: PointerEvent) => {
             event.stopPropagation();
             this.handleResize(card, event);
         });

@@ -62,7 +62,7 @@ body {
 }
 
 .add-button {
-  position: absolute;
+  position: fixed;
   top: 10px;
   left: 10px;
   height: 40px;
@@ -92,7 +92,7 @@ body {
   right: 5px;
   height: 25px;
   width: 25px;
-  font-size: 25px;
+  font-size: 15px;
 }
 .delete-button:hover {
   border-color: red;
@@ -113,7 +113,7 @@ body {
 }
 
 .counter-container {
-  position: absolute;
+  position: fixed;
   min-width: 180px;
   z-index: 0;
   top: 0;
@@ -137,6 +137,33 @@ body {
   z-index: 1000;
 }
 
-.editor-container .button {
-  margin-top: 10px;
+
+/* Friggin' importants aka custom buttons inside TMCE */
+.editor-button-container {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  height: 100% !important;
+  margin-left: 10px !important;
+  gap: 5px !important;
+}
+
+.editor-button {
+  width: 25px !important;
+  height: 25px !important;
+  border: 2px solid gray !important;
+  border-radius: 5px !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  font-weight: 600 !important;
+  font-family: 'Courier New', Courier, monospace !important;
+}
+.editor-save-button:hover {
+  border-color: lime !important;
+  color: lime !important;
+}
+.editor-cancel-button:hover {
+  border-color: red !important;
+  color: red !important;
 }
