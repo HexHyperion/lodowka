@@ -1,28 +1,31 @@
 import Fridge from "./fridge";
+import { CardData } from "./types";
 import tinymce from 'tinymce';
 
 export default class Card {
-    contents: string = "Bob the Card";
-    width: number = 200;
-    height: number = 200;
+    contents: string = "Bob the Card<br><em>(He's editable!)</em>";
+    width: number = 170;
+    height: number = 170;
     zIndex: number = 1;
     x: number;
     y: number;
 
-    constructor() {
+    constructor(data?: CardData) {
         const card = document.createElement("div");
         card.classList.add("card");
 
         const cardText = document.createElement("div");
         cardText.classList.add("card-text");
-        cardText.innerHTML = this.contents;
+        cardText.innerHTML = data?.contents ?? this.contents;
         card.appendChild(cardText);
 
+        this.width = data?.width ?? this.width;
+        this.height = data?.height ?? this.height;
         card.style.width = `${this.width}px`;
         card.style.height = `${this.height}px`;
 
-        this.x = 75 + Math.floor(Math.random()*20);     // So they don't all stack on top of each other invisibly
-        this.y = 75 + Math.floor(Math.random()*20);
+        this.x = data?.x ?? 75 + Math.floor(Math.random()*20);  // So they don't all stack on top of each other invisibly
+        this.y = data?.y ?? 75 + Math.floor(Math.random()*20);
         card.style.top = `${this.y}px`;
         card.style.left = `${this.x}px`;
 
@@ -30,6 +33,8 @@ export default class Card {
         this.handleDrag(card);
 
         Fridge.area.appendChild(card);
+
+        this.bringToFront(card);
 
         card.addEventListener("mousedown", () => {
             this.bringToFront(card);
@@ -53,6 +58,7 @@ export default class Card {
             document.removeEventListener("pointermove", doDrag);
             document.removeEventListener("pointerup", stopDrag);
             card.classList.remove("card-held");
+            Fridge.saveState();
         };
 
         card.addEventListener("pointerdown", (event: PointerEvent) => {
@@ -72,6 +78,7 @@ export default class Card {
         });
     }
 
+
     handleResize(card: HTMLDivElement, event: PointerEvent) {
         let startX = event.clientX;
         let startY = event.clientY;
@@ -79,8 +86,8 @@ export default class Card {
         let startWidth = card.clientWidth;
         let startHeight = card.clientHeight;
 
-        const minWidth = 150;
-        const minHeight = 150;
+        const minWidth = 100;
+        const minHeight = 100;
 
         const doDrag = (event: PointerEvent) => {
             const newWidth = startWidth + event.clientX - startX;
@@ -100,6 +107,7 @@ export default class Card {
             document.documentElement.removeEventListener('pointermove', doDrag);
             document.documentElement.removeEventListener('pointerup', stopDrag);
             card.classList.remove("card-resizing");
+            Fridge.saveState();
         };
 
         document.documentElement.addEventListener('pointermove', doDrag);
@@ -114,10 +122,12 @@ export default class Card {
 
         const overlay = document.createElement("div");
         overlay.classList.add("editor-overlay");
+        overlay.style.zIndex = `${Fridge.maxZIndex + 2}`;   // Ensure overlay is above all cards
         document.body.appendChild(overlay);
 
         const editorContainer = document.createElement("div");
         editorContainer.classList.add("editor-container");
+        editorContainer.style.zIndex = `${Fridge.maxZIndex + 3}`;   // Ensure editor is above the overlay
 
         const textarea = document.createElement("textarea");
         textarea.id = `editor-${Date.now()}`;       // Set a unique ID for the textarea, otherwise there will be an error when initializing TinyMCE
@@ -132,6 +142,7 @@ export default class Card {
             toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media | spellcheckdialog a11ycheck typography | align lineheight | emoticons charmap | removeformat',
             menubar: false,
             content_style: "body { background-color: black; color: white; }",
+            license_key: "gpl",
             setup: (editor) => {
                 editor.on('init', () => {
                     editor.setContent(textarea.value);
@@ -158,6 +169,7 @@ export default class Card {
                             document.body.removeChild(editorContainer);
                             document.body.removeChild(overlay);
                             card.classList.remove("card-editing");
+                            Fridge.saveState();
                         });
 
                         const cancelButton = document.createElement("button");
@@ -166,6 +178,7 @@ export default class Card {
                         cancelButton.classList.add("editor-button");
                         cancelButton.classList.add("editor-cancel-button");
                         cancelButton.addEventListener("click", () => {
+                            tinymce.remove(editor);
                             document.body.removeChild(editorContainer);
                             document.body.removeChild(overlay);
                             card.classList.remove("card-editing");
@@ -205,17 +218,20 @@ export default class Card {
         deleteButton.addEventListener("pointerdown", (event: PointerEvent) => {
             event.stopPropagation();
             card.style.borderColor = "red";
-        });
-        deleteButton.addEventListener("pointerup", (event: PointerEvent) => {
-            if (event.target === deleteButton) {
-                Fridge.removeCard(this);
-                card.remove();
-            } else {
+
+            deleteButton.addEventListener("pointerup", (event: PointerEvent) => {
+                if (event.target == deleteButton) {
+                    Fridge.removeCard(this);
+                    card.remove();
+                    Fridge.saveState();
+                }
+                else {
+                    card.style.borderColor = "white";
+                }
+            });
+            deleteButton.addEventListener("pointerleave", () => {
                 card.style.borderColor = "white";
-            }
-        });
-        deleteButton.addEventListener("pointerleave", () => {
-            card.style.borderColor = "white";
+            });
         });
         card.appendChild(deleteButton);
 
@@ -228,5 +244,17 @@ export default class Card {
             this.handleResize(card, event);
         });
         card.appendChild(resizeButton);
+    }
+
+
+    jsonify() {
+        return {
+            contents: this.contents,
+            width: this.width,
+            height: this.height,
+            zIndex: this.zIndex,
+            x: this.x,
+            y: this.y
+        };
     }
 }
