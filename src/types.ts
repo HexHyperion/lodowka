@@ -5,4 +5,4 @@ export type CardData = {
     zIndex: number;
     x: number;
     y: number;
-}
+};

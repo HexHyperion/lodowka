@@ -24,8 +24,8 @@ export default class Card {
         card.style.width = `${this.width}px`;
         card.style.height = `${this.height}px`;
 
-        this.x = data?.x ?? 75 + Math.floor(Math.random()*20);  // So they don't all stack on top of each other invisibly
-        this.y = data?.y ?? 75 + Math.floor(Math.random()*20);
+        this.x = data?.x ?? 75 + Math.floor(Math.random() * 20);    // So they don't all stack on top of each other invisibly
+        this.y = data?.y ?? 75 + Math.floor(Math.random() * 20);
         card.style.top = `${this.y}px`;
         card.style.left = `${this.x}px`;
 

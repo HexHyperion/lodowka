@@ -49,6 +49,7 @@ export default class Fridge {
         this.mileageCounter.innerText = this.cardMileage.toString();
     }
 
+
     static saveState() {
         const state = {
             cards: this.cards.map(card => card.jsonify()),
