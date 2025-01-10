@@ -46,6 +46,7 @@ export default class Card {
             this.y = initialY + event.clientY - startY;
             card.style.top = `${this.y}px`;
             card.style.left = `${this.x}px`;
+            this.bringToFront(card);
         };
 
         const stopDrag = () => {
@@ -61,6 +62,8 @@ export default class Card {
             startY = event.clientY;
             initialX = card.offsetLeft;
             initialY = card.offsetTop;
+
+            this.bringToFront(card);
 
             document.addEventListener("pointermove", doDrag);
             document.addEventListener("pointerup", stopDrag);
@@ -107,6 +110,12 @@ export default class Card {
 
 
     showEditor(card: HTMLDivElement) {
+        card.classList.add("card-editing");
+
+        const overlay = document.createElement("div");
+        overlay.classList.add("editor-overlay");
+        document.body.appendChild(overlay);
+
         const editorContainer = document.createElement("div");
         editorContainer.classList.add("editor-container");
 
@@ -147,6 +156,8 @@ export default class Card {
                                 this.contents = content;
                             }
                             document.body.removeChild(editorContainer);
+                            document.body.removeChild(overlay);
+                            card.classList.remove("card-editing");
                         });
 
                         const cancelButton = document.createElement("button");
@@ -156,6 +167,8 @@ export default class Card {
                         cancelButton.classList.add("editor-cancel-button");
                         cancelButton.addEventListener("click", () => {
                             document.body.removeChild(editorContainer);
+                            document.body.removeChild(overlay);
+                            card.classList.remove("card-editing");
                         });
 
                         buttonContainer.appendChild(saveButton);
@@ -189,9 +202,20 @@ export default class Card {
         deleteButton.innerText = "\u2716";   // Unicode heavy multiplication sign
         deleteButton.classList.add("button");
         deleteButton.classList.add("delete-button");
-        deleteButton.addEventListener("pointerdown", () => {
-            Fridge.removeCard(this);
-            card.remove();
+        deleteButton.addEventListener("pointerdown", (event: PointerEvent) => {
+            event.stopPropagation();
+            card.style.borderColor = "red";
+        });
+        deleteButton.addEventListener("pointerup", (event: PointerEvent) => {
+            if (event.target === deleteButton) {
+                Fridge.removeCard(this);
+                card.remove();
+            } else {
+                card.style.borderColor = "white";
+            }
+        });
+        deleteButton.addEventListener("pointerleave", () => {
+            card.style.borderColor = "white";
         });
         card.appendChild(deleteButton);
 

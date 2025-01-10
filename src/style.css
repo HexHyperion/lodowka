@@ -30,12 +30,19 @@ body {
   overflow: hidden;
   top: 0;
   left: 0;
+  z-index: 1; /* Ensure cards have a default z-index */
 }
 .card.card-held {
   border: 2px solid yellow;
 }
 .card.card-resizing {
   border: 2px solid turquoise;
+}
+.card.card-editing {
+  border: 2px solid orange;
+}
+.card.card-editing .edit-button {
+  border: 2px solid orange;
 }
 
 .card-text {
@@ -131,12 +138,26 @@ body {
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: black;
-  border: 2px solid white;
+  border: 2px solid orange;
   border-radius: 10px;
   padding: 20px;
-  z-index: 1000;
+  z-index: 99999999;
+  width: 90%;
+  max-width: 1000px;
+  box-sizing: border-box;
+  pointer-events: auto;
 }
 
+.editor-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 9999999;
+  pointer-events: auto;
+}
 
 /* Friggin' importants aka custom buttons inside TMCE */
 .editor-button-container {
